@@ -383,8 +383,7 @@ with tab4:
     )
 
 with tab5:
-
-    st.header("Clinical Timeline Explorer")
+    st.markdown("## 🧬 Clinical Timeline Explorer")
 
     timeline_df = pd.DataFrame({
         "Age":[19,22,24,45,50,53],
@@ -403,28 +402,37 @@ with tab5:
         x="Age",
         y=["Patient 001"] * len(timeline_df),
         hover_name="Event",
-        size=[15]*len(timeline_df)
+        size=[18]*len(timeline_df),
+        color_discrete_sequence=["#00D4FF"]
     )
 
     fig.update_layout(
         template="plotly_dark",
-        height=450,
+        height=420,
+        margin=dict(l=20, r=20, t=40, b=20),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         showlegend=False
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.metric(
-        "Diagnostic Delay",
-        f"{patient001['Diagnostic_Delay_Years']} years"
-    )
+    col1, col2 = st.columns([1,2])
+
+    with col1:
+        st.metric(
+            "Diagnostic Delay",
+            f"{patient001['Diagnostic_Delay_Years']} years"
+        )
+
+    with col2:
+        st.info("Timeline reconstructed from clinical history and retrospective symptom mapping.")
 
 with tab6:
-
-    st.header("Research Navigator")
+    st.markdown("## 🔬 Research Navigator")
 
     research_question = st.selectbox(
-        "Choose Question",
+        "Select Research Focus",
         [
             "Amenorrhoea Effect",
             "Diagnostic Delay",
@@ -433,36 +441,34 @@ with tab6:
         ]
     )
 
+    st.divider()
+
     if research_question == "Amenorrhoea Effect":
 
-        st.success(
-            "Symptoms improved during hypoestrogenic amenorrhoea."
-        )
+        st.success("Symptoms improved during hypoestrogenic amenorrhoea.")
 
         st.markdown("""
-### Potential Mechanisms
+#### 🧠 Potential Mechanisms
+- Estrogen-sensitive lesion activity  
+- Reduced inflammatory signalling  
+- Reduced fibrosis progression  
 
-1. Estrogen-sensitive lesion activity
-
-2. Reduced inflammatory signalling
-
-3. Reduced fibrosis progression
-
-### Evidence Strength
-
-Moderate to Strong
+#### 📊 Evidence Strength
+**Moderate → Strong**
 """)
 
     elif research_question == "Diagnostic Delay":
 
-        st.metric(
-            "Delay",
-            f"{patient001['Diagnostic_Delay_Years']} years"
-        )
+        col1, col2 = st.columns(2)
 
-        st.warning(
-            "Symptoms began decades before diagnosis."
-        )
+        with col1:
+            st.metric(
+                "Delay",
+                f"{patient001['Diagnostic_Delay_Years']} years"
+            )
+
+        with col2:
+            st.warning("Symptoms began decades before formal diagnosis.")
 
     elif research_question == "Surgical Recurrence":
 
@@ -472,32 +478,27 @@ Moderate to Strong
         )
 
         st.markdown("""
-Possible explanations:
-
-- residual disease
-- fibrosis
-- nerve involvement
-- incomplete excision
+#### Possible Explanations
+- Residual disease  
+- Fibrosis  
+- Nerve involvement  
+- Incomplete excision  
 """)
 
     elif research_question == "Familial Clustering":
 
-        st.write("""
-Mother:
-- chronic constipation
+        st.info("""
+Family symptom clustering suggests possible genetic or environmental contribution.
+""")
 
-Sister:
-- dysmenorrhoea
-- urinary symptoms
-- hydronephrosis
-
-Patient:
-- bowel-dominant disease
+        st.markdown("""
+- **Mother:** chronic constipation  
+- **Sister:** dysmenorrhoea, urinary symptoms, hydronephrosis  
+- **Patient:** bowel-dominant disease  
 """)
 
 with tab7:
-
-    st.header("Missed Phenotype Detector")
+    st.markdown("## ⚠️ Missed Phenotype Detector")
 
     classic_features = {
         "Pelvic Pain": patient001["Pelvic_Pain"],
@@ -506,31 +507,27 @@ with tab7:
     }
 
     absent_count = sum(v == False for v in classic_features.values())
-
-    atypicality = (
-        absent_count /
-        len(classic_features)
-    ) * 100
+    atypicality = (absent_count / len(classic_features)) * 100
 
     st.metric(
         "Phenotype Atypicality Score",
         f"{atypicality:.0f}%"
     )
 
-    st.error(
-        "Histologically confirmed disease despite lacking multiple classic features."
-    )
+    st.error("Histologically confirmed disease despite atypical presentation.")
+
+    st.markdown("### Feature Breakdown")
 
     st.dataframe(
         pd.DataFrame({
-            "Feature": classic_features.keys(),
-            "Present": classic_features.values()
-        })
+            "Feature": list(classic_features.keys()),
+            "Present": list(classic_features.values())
+        }),
+        use_container_width=True
     )
 
 with tab8:
-
-    st.header("Family Pattern Explorer")
+    st.markdown("## 👨‍👩‍👧 Family Pattern Explorer")
 
     family_df = pd.DataFrame({
         "Relative":["Mother","Sister","Patient"],
@@ -542,24 +539,23 @@ with tab8:
     fig = px.imshow(
         family_df.set_index("Relative"),
         text_auto=True,
+        color_continuous_scale="Blues",
         aspect="auto"
     )
 
     fig.update_layout(
         template="plotly_dark",
-        height=450
+        height=420,
+        margin=dict(l=20, r=20, t=40, b=20)
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
 with tab9:
-
-    st.header("Symptom Evolution Dashboard")
-
-    ages = [19,24,35,45,50,53]
+    st.markdown("## 📈 Symptom Evolution Dashboard")
 
     symptom_df = pd.DataFrame({
-        "Age": ages,
+        "Age": [19,24,35,45,50,53],
         "Constipation":[2,7,8,9,10,10],
         "Tenesmus":[0,1,3,7,9,9],
         "Pelvic Symptoms":[0,0,0,1,2,3]
@@ -568,38 +564,24 @@ with tab9:
     fig = px.line(
         symptom_df,
         x="Age",
-        y=[
-            "Constipation",
-            "Tenesmus",
-            "Pelvic Symptoms"
-        ],
+        y=["Constipation","Tenesmus","Pelvic Symptoms"],
         markers=True
     )
 
     fig.update_layout(
         template="plotly_dark",
-        height=500
+        height=500,
+        margin=dict(l=20, r=20, t=40, b=20)
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
 with tab10:
-
-    st.header("Surgery Response Analysis")
+    st.markdown("## 🏥 Surgery Response Analysis")
 
     surgery_df = pd.DataFrame({
-        "Stage":[
-            "Pre-op",
-            "Post-op",
-            "3 Months",
-            "Recurrence"
-        ],
-        "Symptom Burden":[
-            10,
-            4,
-            3,
-            8
-        ]
+        "Stage":["Pre-op","Post-op","3 Months","Recurrence"],
+        "Symptom Burden":[10,4,3,8]
     })
 
     fig = px.line(
@@ -611,18 +593,16 @@ with tab10:
 
     fig.update_layout(
         template="plotly_dark",
-        height=450
+        height=420,
+        margin=dict(l=20, r=20, t=40, b=20)
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.warning(
-        "Temporary improvement followed by symptom recurrence."
-    )
+    st.warning("Temporary improvement followed by recurrence of symptoms.")
 
 with tab11:
-
-    st.header("Evidence Map")
+    st.markdown("## 🧾 Evidence Map")
 
     support_df = pd.DataFrame({
         "Supporting Evidence":[
@@ -644,16 +624,15 @@ with tab11:
 
     with col1:
         st.success("Supporting Evidence")
-        st.dataframe(support_df)
+        st.dataframe(support_df, use_container_width=True)
 
     with col2:
         st.warning("Atypical Features")
-        st.dataframe(contradiction_df)
+        st.dataframe(contradiction_df, use_container_width=True)
 
-    st.metric(
-        "Research Confidence",
-        "Moderate"
-    )
+    st.divider()
+
+    st.metric("Research Confidence", "Moderate")
 
 
 
