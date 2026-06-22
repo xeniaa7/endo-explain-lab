@@ -152,12 +152,40 @@ feature_importance_df = feature_importance_df.sort_values(
     ascending=False
 )
 
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
     "Risk Assessment",
     "Model Explanation",
     "3D Risk Landscape",
-    "Diagnostic Delay Simulator"
+    "Diagnostic Delay Simulator",
+    "Clinical Timeline",
+    "Research Navigator",
+    "Missed Phenotype Detector",
+    "Family Pattern Explorer",
+    "Symptom Evolution",
+    "Surgery Response",
+    "Evidence Map"
 ])
+
+feature_importance_df = feature_importance_df.sort_values(...)
+
+patient001 = {
+    "Age_Symptom_Onset": 19,
+    "Diagnosis_Age": 50,
+    "Diagnostic_Delay_Years": 31,
+    "Constipation": True,
+    "Tenesmus": True,
+    "Obstructive_Bowel_Sensation": True,
+    "Rectal_Mucus": True,
+    "Rectal_Bleeding": True,
+    "Pelvic_Pain": False,
+    "Dysmenorrhoea": False,
+    "Infertility_Investigation": False,
+    "Symptoms_Improved_During_Amenorrhoea": True,
+    "Rectovaginal_Endometriosis": True,
+    "Postoperative_Improvement": True,
+    "Improvement_Duration_Months": 3,
+    "Symptom_Recurrence": True
+}
 
 with tab1:
     st.header("Risk Assessment")
@@ -354,6 +382,281 @@ with tab4:
         "This is not a clinical diagnostic-delay model. It is a conceptual simulation "
         "showing how repeated non-referral may compound over time."
     )
+
+with tab5:
+
+    st.header("Clinical Timeline Explorer")
+
+    timeline_df = pd.DataFrame({
+        "Age":[19,22,24,45,50,53],
+        "Event":[
+            "Constipation onset",
+            "Amenorrhoea",
+            "Major bowel episode",
+            "Started HRT",
+            "Histology confirmed",
+            "Current status"
+        ]
+    })
+
+    fig = px.scatter(
+        timeline_df,
+        x="Age",
+        y=["Patient 001"] * len(timeline_df),
+        hover_name="Event",
+        size=[15]*len(timeline_df)
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=450,
+        showlegend=False
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.metric(
+        "Diagnostic Delay",
+        f"{patient001['Diagnostic_Delay_Years']} years"
+    )
+
+with tab6:
+
+    st.header("Research Navigator")
+
+    research_question = st.selectbox(
+        "Choose Question",
+        [
+            "Amenorrhoea Effect",
+            "Diagnostic Delay",
+            "Surgical Recurrence",
+            "Familial Clustering"
+        ]
+    )
+
+    if research_question == "Amenorrhoea Effect":
+
+        st.success(
+            "Symptoms improved during hypoestrogenic amenorrhoea."
+        )
+
+        st.markdown("""
+### Potential Mechanisms
+
+1. Estrogen-sensitive lesion activity
+
+2. Reduced inflammatory signalling
+
+3. Reduced fibrosis progression
+
+### Evidence Strength
+
+Moderate to Strong
+""")
+
+    elif research_question == "Diagnostic Delay":
+
+        st.metric(
+            "Delay",
+            f"{patient001['Diagnostic_Delay_Years']} years"
+        )
+
+        st.warning(
+            "Symptoms began decades before diagnosis."
+        )
+
+    elif research_question == "Surgical Recurrence":
+
+        st.metric(
+            "Improvement Duration",
+            f"{patient001['Improvement_Duration_Months']} months"
+        )
+
+        st.markdown("""
+Possible explanations:
+
+- residual disease
+- fibrosis
+- nerve involvement
+- incomplete excision
+""")
+
+    elif research_question == "Familial Clustering":
+
+        st.write("""
+Mother:
+- chronic constipation
+
+Sister:
+- dysmenorrhoea
+- urinary symptoms
+- hydronephrosis
+
+Patient:
+- bowel-dominant disease
+""")
+
+with tab7:
+
+    st.header("Missed Phenotype Detector")
+
+    classic_features = {
+        "Pelvic Pain": patient001["Pelvic_Pain"],
+        "Dysmenorrhoea": patient001["Dysmenorrhoea"],
+        "Infertility Investigation": patient001["Infertility_Investigation"]
+    }
+
+    absent_count = sum(v == False for v in classic_features.values())
+
+    atypicality = (
+        absent_count /
+        len(classic_features)
+    ) * 100
+
+    st.metric(
+        "Phenotype Atypicality Score",
+        f"{atypicality:.0f}%"
+    )
+
+    st.error(
+        "Histologically confirmed disease despite lacking multiple classic features."
+    )
+
+    st.dataframe(
+        pd.DataFrame({
+            "Feature": classic_features.keys(),
+            "Present": classic_features.values()
+        })
+    )
+
+with tab8:
+
+    st.header("Family Pattern Explorer")
+
+    family_df = pd.DataFrame({
+        "Relative":["Mother","Sister","Patient"],
+        "Constipation":[1,0,1],
+        "Urinary Symptoms":[0,1,0],
+        "Dysmenorrhoea":[0,1,0]
+    })
+
+    fig = px.imshow(
+        family_df.set_index("Relative"),
+        text_auto=True,
+        aspect="auto"
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=450
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+with tab9:
+
+    st.header("Symptom Evolution Dashboard")
+
+    ages = [19,24,35,45,50,53]
+
+    symptom_df = pd.DataFrame({
+        "Age": ages,
+        "Constipation":[2,7,8,9,10,10],
+        "Tenesmus":[0,1,3,7,9,9],
+        "Pelvic Symptoms":[0,0,0,1,2,3]
+    })
+
+    fig = px.line(
+        symptom_df,
+        x="Age",
+        y=[
+            "Constipation",
+            "Tenesmus",
+            "Pelvic Symptoms"
+        ],
+        markers=True
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=500
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+with tab10:
+
+    st.header("Surgery Response Analysis")
+
+    surgery_df = pd.DataFrame({
+        "Stage":[
+            "Pre-op",
+            "Post-op",
+            "3 Months",
+            "Recurrence"
+        ],
+        "Symptom Burden":[
+            10,
+            4,
+            3,
+            8
+        ]
+    })
+
+    fig = px.line(
+        surgery_df,
+        x="Stage",
+        y="Symptom Burden",
+        markers=True
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=450
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.warning(
+        "Temporary improvement followed by symptom recurrence."
+    )
+
+with tab11:
+
+    st.header("Evidence Map")
+
+    support_df = pd.DataFrame({
+        "Supporting Evidence":[
+            "Histology confirmed",
+            "Improved during amenorrhoea",
+            "Improved after surgery"
+        ]
+    })
+
+    contradiction_df = pd.DataFrame({
+        "Contradictory Features":[
+            "No dysmenorrhoea",
+            "No pelvic pain",
+            "Non-cyclic symptoms"
+        ]
+    })
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.success("Supporting Evidence")
+        st.dataframe(support_df)
+
+    with col2:
+        st.warning("Atypical Features")
+        st.dataframe(contradiction_df)
+
+    st.metric(
+        "Research Confidence",
+        "Moderate"
+    )
+
+
 
 st.markdown("---")
 
