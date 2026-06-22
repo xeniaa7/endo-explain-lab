@@ -509,22 +509,30 @@ with tab7:
     absent_count = sum(v == False for v in classic_features.values())
     atypicality = (absent_count / len(classic_features)) * 100
 
-    st.metric(
-        "Phenotype Atypicality Score",
-        f"{atypicality:.0f}%"
-    )
+    # 🧠 Main message (what users should understand first)
+    if atypicality > 60:
+        st.error("This case would likely be MISSED in a typical diagnostic pathway.")
 
-    st.error("Histologically confirmed disease despite atypical presentation.")
+    elif atypicality > 30:
+        st.warning("This case shows mixed classical and atypical features.")
 
-    st.markdown("### Feature Breakdown")
+    else:
+        st.success("This case follows a typical endometriosis pattern.")
 
-    st.dataframe(
-        pd.DataFrame({
-            "Feature": list(classic_features.keys()),
-            "Present": list(classic_features.values())
-        }),
-        use_container_width=True
-    )
+    # 📊 Simple visual instead of table
+    st.markdown("### Clinical feature overview")
+
+    for feature, present in classic_features.items():
+        if present:
+            st.success(f"✔ {feature}")
+        else:
+            st.error(f"✖ {feature}")
+
+    # 🔽 Optional technical detail
+    with st.expander("Technical breakdown"):
+        st.write("Atypicality score calculation:")
+        st.write(f"{absent_count}/{len(classic_features)} features absent")
+        st.metric("Atypicality Score", f"{atypicality:.0f}%")
 
 with tab8:
     st.markdown("## 👨‍👩‍👧 Family Pattern Explorer")
